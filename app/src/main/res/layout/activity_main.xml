@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:padding="16dp"
+    tools:context=".MainActivity"
+    tools:layout_editor_absoluteX="-1dp"
+    tools:layout_editor_absoluteY="-3dp">
+    <Button
+        android:id="@+id/btnResetShotClock"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dp"
+        android:text="Reset"
+        android:textColor="#00FF00"
+        android:textColorLink="#FF9900"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        app:cornerRadius="0sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn14ShotClock"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtShotClock"
+        app:strokeColor="#00FF00" />
+
+    <Button
+        android:id="@+id/btn14ShotClock"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dp"
+        android:text="14"
+        android:textColor="#00FF00"
+        android:textColorLink="#FF9900"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        app:cornerRadius="0sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnResetShotClock"
+        app:layout_constraintTop_toBottomOf="@+id/txtShotClock"
+        app:strokeColor="#00FF00" />
+
+    <Button
+        android:id="@+id/btnMinAway"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="1dp"
+        android:padding="0dp"
+        android:text="-"
+        android:textColor="#FD9900"
+        android:textColorLink="#FF9900"
+        android:textSize="30sp"
+        app:cornerRadius="0sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnAddAway"
+        app:strokeColor="#F28E00" />
+
+    <Button
+        android:id="@+id/btnAddAway"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="1dp"
+        android:padding="0dp"
+        android:text="+"
+        android:textColor="#FD9900"
+        android:textColorLink="#FF9900"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        app:cornerRadius="0sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="#F28E00" />
+
+    <Button
+        android:id="@+id/btnAddHome"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="40dp"
+        android:padding="0dp"
+        android:text="+"
+        android:textColor="#FD9900"
+        android:textColorLink="#FF9900"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        app:cornerRadius="0sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="#F28E00" />
+
+    <Button
+        android:id="@+id/btnMinHome"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="8dp"
+        android:padding="0dp"
+        android:text="-"
+        android:textColor="#FD9900"
+        android:textColorLink="#FF9900"
+        android:textSize="30sp"
+        app:cornerRadius="0sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnAddHome"
+        app:strokeColor="#F28E00" />
+
+    <TextView
+        android:id="@+id/teamHomeScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/ledstraight"
+        android:text="129"
+        android:textColor="@color/white"
+        android:textSize="80sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/timerTextView"
+        app:layout_constraintHorizontal_bias="0.664"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamHomeLabel" />
+
+    <TextView
+        android:id="@+id/teamHomeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/timerTextView"
+        app:layout_constraintHorizontal_bias="0.623"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/teamAwayScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/ledstraight"
+        android:text="129"
+        android:textColor="@color/white"
+        android:textSize="80sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.474"
+        app:layout_constraintStart_toEndOf="@+id/timerTextView"
+        app:layout_constraintTop_toBottomOf="@+id/teamAwayLabel" />
+
+    <TextView
+        android:id="@+id/teamAwayLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Away"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.448"
+        app:layout_constraintStart_toEndOf="@+id/timerTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/timerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ledstraight"
+        android:text="12:00"
+        android:textColor="@color/red"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.147" />
+
+    <TextView
+        android:id="@+id/txtShotClock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/ledstraight"
+        android:text="24"
+        android:textColor="#00FF00"
+        android:textSize="80sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timerTextView" />
+
+    <TextView
+        android:id="@+id/periodTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Q1"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/timerTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/imageButton4"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintEnd_toStartOf="@+id/teamHomeLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/red_triangle" />
+
+    <ImageButton
+        android:id="@+id/imageButton5"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="#00FFFFFF"
+        android:rotation="180"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/teamAwayLabel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/red_triangle" />
+
+    <TextView
+        android:id="@+id/txtTimeoutCtr2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="60dp"
+        android:text="T0"
+        android:textColor="#00BCD4"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamAwayScore" />
+
+    <TextView
+        android:id="@+id/txtFoulCtr2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="100dp"
+        android:text="F0"
+        android:textColor="#FFEB3B"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamAwayScore" />
+
+    <TextView
+        android:id="@+id/txtFoulCtr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="4dp"
+        android:text="F0"
+        android:textColor="#FFEB3B"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamHomeScore" />
+
+    <TextView
+        android:id="@+id/txtTimeoutCtr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:text="T0"
+        android:textColor="#00BCD4"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toStartOf="@+id/txtFoulCtr"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/teamHomeScore" />
+
+    <Button
+        android:id="@+id/btnMenu"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/white" />
+
+    <Button
+        android:id="@+id/btnEdit"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:strokeColor="@color/white" />
+
+    <include layout="@layout/modal_edit_layout" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

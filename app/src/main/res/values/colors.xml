@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#39FF14</color>
+
+    <color name="primary_color">#3F51B5</color> <!-- Example primary color -->
+    <color name="dark_gray">#757575</color>
+    <color name="google_button_color">#FFFFFF</color> <!-- Google Sign-in button color (white) -->
+    <color name="google_icon_color">#4285F4</color> <!-- Google icon blue color (example) -->
+
+</resources>

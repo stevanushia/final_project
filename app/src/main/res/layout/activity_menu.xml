@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MenuActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#121212">
+
+        <!-- Top Bar -->
+        <LinearLayout
+            android:id="@+id/topBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Home/Feed"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Profile Button -->
+            <ImageButton
+                android:id="@+id/profileButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:contentDescription="Profile"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_profile" />
+        </LinearLayout>
+
+        <!-- Main Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/topBar"
+            android:layout_above="@id/bottomNav"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Scoreboard Button -->
+            <Button
+                android:id="@+id/scoreboardButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#1A8A9E"
+                android:drawableStart="@drawable/ic_profile"
+                android:drawablePadding="8dp"
+                android:padding="12dp"
+                android:text="Scoreboard"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <!-- Tournament Button -->
+            <Button
+                android:id="@+id/tournamentButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#1A8A9E"
+                android:text="Tournament"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:drawableStart="@drawable/common_google_signin_btn_icon_dark"
+                android:drawablePadding="8dp"
+                android:padding="12dp" />
+        </LinearLayout>
+
+        <!-- Bottom Navigation -->
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
