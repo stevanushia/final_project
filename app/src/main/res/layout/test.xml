@@ -51,28 +51,28 @@
 
             <!-- Scoreboard Button -->
             <Button
-                android:id="@+id/scoreboardButton"
+                android:id="@+id/btnScoreboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#1A8A9E"
                 android:text="Scoreboard"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
-                android:drawableStart="@drawable/ic_scoreboard"
+                android:drawableStart="@drawable/common_google_signin_btn_icon_dark"
                 android:drawablePadding="8dp"
                 android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Tournament Button -->
             <Button
-                android:id="@+id/tournamentButton"
+                android:id="@+id/btnTournament"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#1A8A9E"
                 android:text="Tournament"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
-                android:drawableStart="@drawable/ic_tournament"
+                android:drawableStart="@drawable/common_google_signin_btn_icon_dark"
                 android:drawablePadding="8dp"
                 android:padding="12dp" />
         </LinearLayout>
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_home"
+                android:src="@drawable/common_google_signin_btn_icon_dark"
                 android:contentDescription="Home" />
 
             <ImageButton
@@ -102,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_explore"
+                android:src="@drawable/common_google_signin_btn_icon_dark"
                 android:contentDescription="Explore" />
 
             <ImageButton
@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_create"
+                android:src="@drawable/common_google_signin_btn_icon_dark"
                 android:contentDescription="Create"
                 android:backgroundTint="#1A8A9E"
                 android:padding="8dp" />
@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_arena"
+                android:src="@drawable/common_google_signin_btn_icon_dark"
                 android:contentDescription="Arena" />
 
             <ImageButton
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_grandstand"
+                android:src="@drawable/common_google_signin_btn_icon_dark"
                 android:contentDescription="Grandstand" />
         </LinearLayout>
 
