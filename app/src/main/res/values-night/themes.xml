@@ -11,4 +11,9 @@
         <item name="postSplashScreenTheme">@style/Base.Theme.Final_Project</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
     </style>
+    <!-- Base application theme. -->
+    <style name="Base.Base.Theme.Final_Project" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
 </resources>

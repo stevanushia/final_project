@@ -15,9 +15,12 @@
         android:theme="@style/Base.Theme.Final_Project"
         tools:targetApi="31">
         <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Base.Theme.Final_Project" />
+        <activity
             android:name=".MenuActivity"
-            android:exported="false" />
-        <!-- ✅ LoginActivity is now the launch activity -->
+            android:exported="false" /> <!-- ✅ LoginActivity is now the launch activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">

@@ -17,6 +17,11 @@ class MenuActivity : AppCompatActivity() {
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.profileButton.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.btnScoreboard.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

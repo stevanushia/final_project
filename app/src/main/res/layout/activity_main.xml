@@ -120,14 +120,14 @@
         android:id="@+id/teamHomeScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/ledstraight"
-        android:text="129"
+        android:text="0"
         android:textColor="@color/white"
         android:textSize="80sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/timerTextView"
-        app:layout_constraintHorizontal_bias="0.664"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.154"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/teamHomeLabel" />
 
@@ -148,15 +148,14 @@
         android:id="@+id/teamAwayScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="88dp"
         android:fontFamily="@font/ledstraight"
-        android:text="129"
+        android:text="0"
         android:textColor="@color/white"
         android:textSize="80sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.474"
-        app:layout_constraintStart_toEndOf="@+id/timerTextView"
         app:layout_constraintTop_toBottomOf="@+id/teamAwayLabel" />
 
     <TextView
