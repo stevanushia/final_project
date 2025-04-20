@@ -49,6 +49,17 @@
         app:strokeColor="#00FF00" />
 
     <Button
+        android:id="@+id/btnSkipTimeout"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:text="Skip Timeout"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtShotClock" />
+
+    <Button
         android:id="@+id/btnMinAway"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="50dp"
@@ -217,7 +228,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageButton
-        android:id="@+id/imageButton4"
+        android:id="@+id/posessionLeft"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:background="#00FFFFFF"
@@ -227,7 +238,7 @@
         app:srcCompat="@drawable/red_triangle" />
 
     <ImageButton
-        android:id="@+id/imageButton5"
+        android:id="@+id/posessionRight"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:background="#00FFFFFF"
@@ -235,7 +246,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/teamAwayLabel"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/red_triangle" />
+        app:srcCompat="@drawable/gray_triangle_1" />
 
     <TextView
         android:id="@+id/txtTimeoutCtr2"

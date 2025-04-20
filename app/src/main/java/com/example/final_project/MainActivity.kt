@@ -53,6 +53,15 @@ class MainActivity : AppCompatActivity() {
     private var isShotClockRunning = false
 //  Shot Clock Controls
 
+//    SHOTCLOCK STATE
+    private var wasShotClockRunningBeforePause = false
+//    SHOTCLOCK STATE
+
+//    GAMETIME STATE
+    private var isTimeoutRunning = false
+//    GAMETIME STATE
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -173,19 +182,29 @@ class MainActivity : AppCompatActivity() {
 
 //  Shot Clock Controls
         binding.btnResetShotClock.setOnClickListener {
-            startShotClock()
-        }
-
-        binding.btnResetShotClock.setOnClickListener {
-            if (!isShotClockRunning) return@setOnClickListener
-            startShotClock(24_000L)
+            resetShotClockTo24()
         }
 
         binding.btn14ShotClock.setOnClickListener {
-            if (!isShotClockRunning) return@setOnClickListener
-            startShotClock(14_000L)
+            setShotClockTo14()
         }
 //  Shot Clock Controls
+
+        binding.btnSkipTimeout.setOnClickListener {
+            pauseShotClock()
+            setShotClockOnly(24_000L, isTimeout = false)
+            showTimeoutUI(false)
+            isTimeoutRunning = false
+        }
+
+        binding.posessionLeft.setOnClickListener {
+            setPossession(isLeft = true)
+        }
+
+        binding.posessionRight.setOnClickListener {
+            setPossession(isLeft = false)
+        }
+
 
         isDataLoaded = true
     }
@@ -200,6 +219,11 @@ class MainActivity : AppCompatActivity() {
 
 //    Game Time Control
     private fun toggleGameTimer() {
+        if (isTimeoutRunning) {
+            Toast.makeText(this, "Cannot start timer during timeout", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         if (isGameRunning) {
             pauseGameTimer()
         } else {
@@ -219,15 +243,33 @@ class MainActivity : AppCompatActivity() {
                 gameTimeRemaining = 0
                 updateGameTimeDisplay()
                 pauseShotClock()
+                isTimeoutRunning = false
             }
         }.start()
         isGameRunning = true
-        startShotClock()
+
+        // Start/resume shot clock only if it's not running
+        if (!isShotClockRunning && wasShotClockRunningBeforePause) {
+            resumeShotClock()
+        } else if (!isShotClockRunning && shotClockRemaining == shotClockMillis) {
+            startShotClock() // only if clock hasn't been started before
+        }
     }
+
+
+    private fun resumeShotClock() {
+        startShotClock(shotClockRemaining)
+    }
+
 
     private fun pauseGameTimer() {
         gameTimer?.cancel()
         isGameRunning = false
+
+        // Save the state
+        wasShotClockRunningBeforePause = isShotClockRunning
+
+        // Pause shot clock
         pauseShotClock()
     }
 
@@ -277,6 +319,8 @@ class MainActivity : AppCompatActivity() {
     private fun startTimeout(duration: Long, isHomeTeam: Boolean) {
         pauseGameTimer()
         startShotClock(duration, isTimeout = true)
+        isTimeoutRunning = true
+        showTimeoutUI(true)
         if (isHomeTeam) {
             homeTimeouts++
             binding.txtTimeoutCtr.text = "T$homeTimeouts"
@@ -288,7 +332,7 @@ class MainActivity : AppCompatActivity() {
 //    Timeout Functionality
 
 //  Shot Clock Controls
-    private fun startShotClock(duration: Long = 24_000L, isTimeout: Boolean = false) {
+    private fun startShotClock(duration: Long = shotClockMillis, isTimeout: Boolean = false) {
         shotClockTimer?.cancel()
         shotClockRemaining = duration
         shotClockTimer = object : CountDownTimer(shotClockRemaining, 1000) {
@@ -296,23 +340,19 @@ class MainActivity : AppCompatActivity() {
                 shotClockRemaining = millisUntilFinished
                 val seconds = (millisUntilFinished / 1000).toInt()
                 binding.txtShotClock.text = seconds.toString()
-                if (isTimeout) {
-                    binding.txtShotClock.setTextColor(Color.BLUE)
-                } else {
-                    binding.txtShotClock.setTextColor(Color.GREEN)
-                }
+                binding.txtShotClock.setTextColor(if (isTimeout) Color.CYAN else Color.GREEN)
             }
 
             override fun onFinish() {
+                if (isTimeout) showTimeoutUI(false)
                 shotClockRemaining = 0
                 binding.txtShotClock.text = "0"
                 binding.txtShotClock.setTextColor(Color.RED)
-                pauseGameTimer() // also pause the game timer if shot clock ends
+                pauseGameTimer()
             }
         }.start()
         isShotClockRunning = true
     }
-
 
     private fun pauseShotClock() {
         shotClockTimer?.cancel()
@@ -322,10 +362,65 @@ class MainActivity : AppCompatActivity() {
     private fun updateShotClockDisplay(isTimeout: Boolean = false) {
         val seconds = (shotClockRemaining / 1000).toInt()
         binding.txtShotClock.text = seconds.toString()
+
         binding.txtShotClock.setTextColor(
-            if (isTimeout) Color.BLUE else Color.BLACK
+            when {
+                isTimeout -> Color.BLUE
+                shotClockRemaining <= 0 -> Color.RED
+                else -> Color.GREEN
+            }
         )
     }
+
+
+    private fun resetShotClockTo24() {
+        shotClockTimer?.cancel()
+        shotClockRemaining = 24_000L
+        updateShotClockDisplay(isTimeout = false)
+
+        isShotClockRunning = isGameRunning
+        if (isGameRunning) {
+            startShotClock(shotClockRemaining)
+        }
+        isTimeoutRunning = false
+    }
+
+    private fun setShotClockTo14() {
+        shotClockTimer?.cancel()
+        shotClockRemaining = 14_000L
+        updateShotClockDisplay(isTimeout = false)
+
+        isShotClockRunning = isGameRunning
+        if (isGameRunning) {
+            startShotClock(shotClockRemaining)
+        }
+        isTimeoutRunning = false
+    }
+
+    private fun setShotClockOnly(duration: Long = 24_000L, isTimeout: Boolean = false) {
+        shotClockTimer?.cancel()
+        shotClockRemaining = duration
+        isShotClockRunning = false
+        updateShotClockDisplay(isTimeout)
+    }
+
 //  Shot Clock Controls
+
+    private fun showTimeoutUI(isTimeout: Boolean) {
+        binding.btnResetShotClock.visibility = if (isTimeout) View.GONE else View.VISIBLE
+        binding.btn14ShotClock.visibility = if (isTimeout) View.GONE else View.VISIBLE
+        binding.btnSkipTimeout.visibility = if (isTimeout) View.VISIBLE else View.GONE
+    }
+
+
+    private fun setPossession(isLeft: Boolean) {
+        if (isLeft) {
+            binding.posessionLeft.setImageResource(R.drawable.red_triangle)
+            binding.posessionRight.setImageResource(R.drawable.gray_triangle_1)
+        } else {
+            binding.posessionLeft.setImageResource(R.drawable.gray_triangle_1)
+            binding.posessionRight.setImageResource(R.drawable.red_triangle)
+        }
+    }
 
 }

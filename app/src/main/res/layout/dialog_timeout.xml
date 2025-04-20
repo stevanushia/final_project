@@ -5,16 +5,6 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <TextView
-        android:id="@+id/tvTimeoutTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Timeout Duration"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:paddingBottom="16dp" />
-
     <RadioGroup
         android:id="@+id/radioGroupTimeout"
         android:layout_width="match_parent"
