@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="#1A1A2E">
+
+    <!-- LEFT PANEL -->
+    <LinearLayout
+        android:id="@+id/scoreButtonsPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginEnd="8dp">
+
+        <Button
+            android:id="@+id/btn3pt"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:backgroundTint="#00FF00"
+            android:text="3pt"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn2pt"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="2pt"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#00FF00"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btn1pt"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="1pt"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#00FF00"
+            android:layout_marginTop="12dp" />
+    </LinearLayout>
+
+    <!-- MIDDLE PANEL -->
+    <LinearLayout
+        android:id="@+id/historyPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:background="#0F0F1F"
+        android:padding="8dp"
+        android:layout_marginEnd="8dp">
+
+        <!-- SCORE HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/txtTeamHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HOME"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/txtScoreHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="#00FF00"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="32dp" />
+
+            <TextView
+                android:id="@+id/txtScoreAway"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="#FF5555"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/txtTeamAway"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AWAY"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- MATCH HISTORY LIST -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerHistory"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp" />
+
+        <!-- FOOTER: QUARTER AND TIME -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/txtQuarter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Q1"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:layout_marginEnd="32dp" />
+
+            <TextView
+                android:id="@+id/txtGameTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:00"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- RIGHT PANEL -->
+    <LinearLayout
+        android:id="@+id/statsButtonsPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnAssist"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="AST" />
+
+        <Button
+            android:id="@+id/btnRebound"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="REB" />
+
+        <Button
+            android:id="@+id/btnSteal"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="STL" />
+
+        <Button
+            android:id="@+id/btnBlock"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="BLK" />
+
+        <Button
+            android:id="@+id/btnTurnover"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="TO" />
+
+        <Button
+            android:id="@+id/btnFoul"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF4444"
+            android:text="FOUL"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>

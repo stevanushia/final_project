@@ -47,7 +47,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/topBar"
-            android:layout_above="@id/bottomNav"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -71,12 +70,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#1A8A9E"
-                android:text="Tournament"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
                 android:drawableStart="@drawable/common_google_signin_btn_icon_dark"
                 android:drawablePadding="8dp"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:text="Tournament"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <!-- Bottom Navigation -->

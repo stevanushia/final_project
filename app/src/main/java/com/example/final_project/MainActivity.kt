@@ -1,13 +1,17 @@
 package com.example.final_project
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
 import android.widget.RadioGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -61,8 +65,21 @@ class MainActivity : AppCompatActivity() {
     private var isTimeoutRunning = false
 //    GAMETIME STATE
 
+    private var homeFoulCount = 0
+    private var awayFoulCount = 0
 
 
+    private val homeTeamPlayers = mutableListOf(
+        DummyPlayer("John"),
+        DummyPlayer("Mike"),
+        DummyPlayer("Chris")
+    )
+
+    private val awayTeamPlayers = mutableListOf(
+        DummyPlayer("Tony"),
+        DummyPlayer("Kevin"),
+        DummyPlayer("Jake")
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,21 +115,10 @@ class MainActivity : AppCompatActivity() {
             hideModal()
         }
 
-        // Example click listeners for modal buttons (replace with your actual logic)
-        modalBinding.btnEditModal.setOnClickListener {
-            Toast.makeText(this, "Edit Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Edit functionality here
-        }
-        modalBinding.btnLiveModal.setOnClickListener {
-            Toast.makeText(this, "Live Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Live functionality here
-        }
-        modalBinding.btnShotClockModal.setOnClickListener {
-            Toast.makeText(this, "Shot Clock Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Shot Clock functionality here
-        }
         modalBinding.btnBreakModal.setOnClickListener {
             Toast.makeText(this, "Break Button Clicked", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, InputStatsActivity::class.java)
+            startActivity(intent)
             // Add your Break functionality here
         }
         modalBinding.btnSwitchModal.setOnClickListener {
@@ -204,6 +210,15 @@ class MainActivity : AppCompatActivity() {
         binding.posessionRight.setOnClickListener {
             setPossession(isLeft = false)
         }
+
+        binding.txtFoulCtr.setOnClickListener {
+            showFoulDialog(homeTeamPlayers, "Home")
+        }
+
+        binding.txtFoulCtr2.setOnClickListener {
+            showFoulDialog(awayTeamPlayers, "Away")
+        }
+
 
 
         isDataLoaded = true
@@ -422,5 +437,43 @@ class MainActivity : AppCompatActivity() {
             binding.posessionRight.setImageResource(R.drawable.red_triangle)
         }
     }
+
+    private fun showFoulDialog(players: MutableList<DummyPlayer>, teamName: String) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_player, null)
+        val listView = dialogView.findViewById<ListView>(R.id.playerListView)
+        val title = dialogView.findViewById<TextView>(R.id.dialogTitle)
+
+        title.text = "Select Foul for $teamName"
+
+        val playerNames = players.mapIndexed { index, player ->
+            "${player.name} - Fouls: ${player.fouls}"
+        }.toMutableList()
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, playerNames)
+        listView.adapter = adapter
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        listView.setOnItemClickListener { _, _, position, _ ->
+            players[position].fouls++
+
+            if (teamName == "Home") {
+                homeFoulCount++
+                binding.txtFoulCtr.text = "F$homeFoulCount"
+            } else {
+                awayFoulCount++
+                binding.txtFoulCtr2.text = "F$awayFoulCount"
+            }
+
+            Toast.makeText(this, "${players[position].name} committed a foul!", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+
+        dialog.show()
+    }
+
 
 }
