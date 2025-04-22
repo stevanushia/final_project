@@ -110,7 +110,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="8dp" />
+            android:background="#0F0F1F"
+            android:contentDescription="Match history log" />
+
 
         <!-- FOOTER: QUARTER AND TIME -->
         <LinearLayout
