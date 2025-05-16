@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.MutableLiveData
 import com.example.final_project.databinding.ActivityMainBinding // Import for your main layout binding
 import com.example.final_project.databinding.ModalEditLayoutBinding // Import for modal layout binding
 import com.google.firebase.database.FirebaseDatabase
@@ -28,17 +29,11 @@ import kotlin.math.abs
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var modalBinding: ModalEditLayoutBinding // Binding for the modal layout
+    private lateinit var modalBinding: ModalEditLayoutBinding
     private val viewModel = GameViewModelProvider.gameStateViewModel
     private lateinit var gestureDetector: GestureDetector
     private var maxPointerCountDuringGesture = 0
     private var currentUserId: String? = null
-
-    // Game Time Control
-    private var gameTimeMillis: Long = 10 * 60 * 1200 // 10 minutes
-    private var gameTimer: CountDownTimer? = null
-    private var isGameRunning = false
-    private var gameTimeRemaining = gameTimeMillis
 
     // Score Management
     private var homeScore = 0
@@ -51,19 +46,6 @@ class MainActivity : AppCompatActivity() {
     // Foul Counter
     private var homeFouls = 0
     private var awayFouls = 0
-
-    // Shot Clock Controls
-    private var shotClockMillis: Long = 24_000
-    private var shotClockRemaining = shotClockMillis
-    private var shotClockTimer: CountDownTimer? = null
-    private var isShotClockRunning = false
-
-    // SHOTCLOCK STATE
-    private var wasShotClockRunningBeforePause = false
-
-    // GAMETIME STATE
-    private var isTimeoutRunning = false
-
     private var homeFoulCount = 0
     private var awayFoulCount = 0
 
@@ -89,18 +71,25 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        modalBinding = ModalEditLayoutBinding.bind(binding.root) // Bind the modal layout to the inflated root view
+        modalBinding = ModalEditLayoutBinding.bind(binding.root)
 
         // Set up ViewModel observers
         setupViewModelObservers()
 
-        // Set onClickListener for the main Edit button to show the modal
+        // If timers were running when activity was destroyed, restart them
+        if (viewModel.isGameTimerRunning.value == true) {
+            // Use a slight delay to ensure UI is ready
+            binding.root.post {
+                viewModel.startGameTimer(restartFromSaved = true)
+            }
+        }
+
         binding.btnMenu.setOnClickListener {
             Toast.makeText(this, "Switch Screen Clicked", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, InputStatsActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            finish() // 🔥 This removes MainActivity from back stack
+            finish()
         }
 
         binding.timerTextView.setOnClickListener {
@@ -132,18 +121,16 @@ class MainActivity : AppCompatActivity() {
 
         // Shot Clock Controls
         binding.btnResetShotClock.setOnClickListener {
-            resetShotClockTo24()
+            viewModel.resetShotClockTo24()
         }
 
         binding.btn14ShotClock.setOnClickListener {
-            setShotClockTo14()
+            viewModel.setShotClockTo14()
         }
 
         binding.btnSkipTimeout.setOnClickListener {
-            pauseShotClock()
-            setShotClockOnly(24_000L, isTimeout = false)
+            viewModel.skipTimeout()
             showTimeoutUI(false)
-            isTimeoutRunning = false
         }
 
         binding.posessionLeft.setOnClickListener {
@@ -186,6 +173,26 @@ class MainActivity : AppCompatActivity() {
             binding.teamAwayScore.text = score.toString()
             awayScore = score
         }
+
+        viewModel.shotClock.observe(this) { shotClockText ->
+            binding.txtShotClock.text = shotClockText
+
+            // Handle text color based on timeout state and time remaining
+            viewModel.isTimeoutRunning.value?.let { isTimeout ->
+                val seconds = shotClockText.toIntOrNull() ?: 0
+                binding.txtShotClock.setTextColor(
+                    when {
+                        isTimeout -> Color.CYAN
+                        seconds <= 5 -> Color.RED
+                        else -> Color.GREEN
+                    }
+                )
+            }
+        }
+
+        viewModel.isTimeoutRunning.observe(this) { isTimeout ->
+            showTimeoutUI(isTimeout)
+        }
     }
 
     private fun setupModalControls() {
@@ -204,23 +211,18 @@ class MainActivity : AppCompatActivity() {
         }
         modalBinding.btnSwitchModal.setOnClickListener {
             Toast.makeText(this, "Switch Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Switch functionality here
         }
         modalBinding.btnBuzzerModal.setOnClickListener {
             Toast.makeText(this, "Buzzer Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Buzzer functionality here
         }
         modalBinding.btnWhistleModal.setOnClickListener {
             Toast.makeText(this, "Whistle Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Whistle functionality here
         }
         modalBinding.btnFoulModal.setOnClickListener {
             Toast.makeText(this, "Foul Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Foul functionality here
         }
         modalBinding.btnResetModal.setOnClickListener {
             Toast.makeText(this, "Reset Button Clicked", Toast.LENGTH_SHORT).show()
-            // Add your Reset functionality here
         }
     }
 
@@ -296,74 +298,16 @@ class MainActivity : AppCompatActivity() {
 
     // Game Time Control
     private fun toggleGameTimer() {
-        if (isTimeoutRunning) {
+        if (viewModel.isTimeoutRunning.value == true) {
             Toast.makeText(this, "Cannot start timer during timeout", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (isGameRunning) {
-            pauseGameTimer()
+        if (viewModel.isGameTimerRunning.value == true) {
+            viewModel.pauseGameTimer()
         } else {
-            startGameTimer()
+            viewModel.startGameTimer()
         }
-    }
-
-    private fun startGameTimer() {
-        if (isTimeoutRunning) {
-            Toast.makeText(this, "Cannot start timer during timeout", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        gameTimer = object : CountDownTimer(gameTimeRemaining, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                gameTimeRemaining = millisUntilFinished
-                updateGameTimeDisplay()
-            }
-
-            override fun onFinish() {
-                isGameRunning = false
-                gameTimeRemaining = 0
-                updateGameTimeDisplay()
-                pauseShotClock()
-                isTimeoutRunning = false
-            }
-        }.start()
-        isGameRunning = true
-
-        // Determine shot clock behavior
-        if (!isShotClockRunning) {
-            if (wasShotClockRunningBeforePause) {
-                resumeShotClock()
-            } else if (shotClockRemaining == shotClockMillis || shotClockRemaining <= 0) {
-                startShotClock(shotClockMillis) // Reset to full time if at 0 or default
-            }
-        }
-    }
-
-    private fun resumeShotClock() {
-        if (shotClockRemaining <= 0) {
-            shotClockRemaining = shotClockMillis
-        }
-        startShotClock(shotClockRemaining)
-    }
-
-    private fun pauseGameTimer() {
-        // Save shot clock state before pausing
-        wasShotClockRunningBeforePause = isShotClockRunning
-
-        // Cancel game timer
-        gameTimer?.cancel()
-        isGameRunning = false
-
-        // Pause shot clock
-        pauseShotClock()
-    }
-
-    private fun updateGameTimeDisplay() {
-        val minutes = (gameTimeRemaining / 1000) / 60
-        val seconds = (gameTimeRemaining / 1000) % 60
-        val timeString = String.format("%02d:%02d", minutes, seconds)
-        viewModel.gameTime.postValue(timeString)
     }
 
     // Timeout Functionality
@@ -394,10 +338,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startTimeout(duration: Long, isHomeTeam: Boolean) {
-        pauseGameTimer()
-        startShotClock(duration, isTimeout = true)
-        isTimeoutRunning = true
-        showTimeoutUI(true)
+        viewModel.startTimeout(duration)
+
         if (isHomeTeam) {
             homeTimeouts++
             binding.txtTimeoutCtr.text = "T$homeTimeouts"
@@ -405,87 +347,6 @@ class MainActivity : AppCompatActivity() {
             awayTimeouts++
             binding.txtTimeoutCtr2.text = "T$awayTimeouts"
         }
-    }
-
-    // Shot Clock Controls
-    private fun startShotClock(duration: Long = shotClockMillis, isTimeout: Boolean = false) {
-        shotClockTimer?.cancel()
-        shotClockRemaining = duration
-        shotClockTimer = object : CountDownTimer(shotClockRemaining, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                shotClockRemaining = millisUntilFinished
-                val seconds = (millisUntilFinished / 1000).toInt()
-
-                // Only update UI if the value has changed
-                if (binding.txtShotClock.text.toString() != seconds.toString()) {
-                    binding.txtShotClock.text = seconds.toString()
-                    binding.txtShotClock.setTextColor(if (isTimeout) Color.CYAN else Color.GREEN)
-                }
-            }
-
-            override fun onFinish() {
-                if (isTimeout) showTimeoutUI(false)
-                shotClockRemaining = 0
-                binding.txtShotClock.text = "0"
-                binding.txtShotClock.setTextColor(Color.RED)
-                isShotClockRunning = false
-
-                if (!isTimeout) {
-                    pauseGameTimer()
-                }
-            }
-        }.start()
-
-        isShotClockRunning = true
-    }
-
-    private fun pauseShotClock() {
-        shotClockTimer?.cancel()
-        isShotClockRunning = false
-    }
-
-    private fun updateShotClockDisplay(isTimeout: Boolean = false) {
-        val seconds = (shotClockRemaining / 1000).toInt()
-        binding.txtShotClock.text = seconds.toString()
-
-        binding.txtShotClock.setTextColor(
-            when {
-                isTimeout -> Color.CYAN
-                seconds <= 5 -> Color.RED
-                else -> Color.GREEN
-            }
-        )
-    }
-
-    private fun resetShotClockTo24() {
-        shotClockTimer?.cancel()
-        shotClockRemaining = 24_000L
-        updateShotClockDisplay(isTimeout = false)
-
-        isShotClockRunning = isGameRunning
-        if (isGameRunning) {
-            startShotClock(shotClockRemaining)
-        }
-        isTimeoutRunning = false
-    }
-
-    private fun setShotClockTo14() {
-        shotClockTimer?.cancel()
-        shotClockRemaining = 14_000L
-        updateShotClockDisplay(isTimeout = false)
-
-        isShotClockRunning = isGameRunning
-        if (isGameRunning) {
-            startShotClock(shotClockRemaining)
-        }
-        isTimeoutRunning = false
-    }
-
-    private fun setShotClockOnly(duration: Long = 24_000L, isTimeout: Boolean = false) {
-        shotClockTimer?.cancel()
-        shotClockRemaining = duration
-        isShotClockRunning = false
-        updateShotClockDisplay(isTimeout)
     }
 
     private fun showTimeoutUI(isTimeout: Boolean) {

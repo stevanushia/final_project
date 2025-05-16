@@ -205,6 +205,15 @@
                 android:id="@+id/txtGameTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="25dp"
+                android:text="10:00"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtShotTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="10:00"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />

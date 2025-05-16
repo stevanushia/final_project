@@ -55,10 +55,30 @@ class InputStatsActivity : AppCompatActivity() {
         setupViewModelObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Make sure the UI reflects the current state when activity becomes visible
+        // No need to start/stop timers - they continue in the ViewModel
+        updateTimerDisplays()
+    }
+
+    private fun updateTimerDisplays() {
+        // Update the UI based on current ViewModel state
+        binding.txtGameTime.text = viewModel.gameTime.value ?: "12:00"
+        binding.txtShotTime.text = viewModel.shotClock.value ?: "24"
+        binding.txtQuarter.text = viewModel.quarter.value ?: "Q1"
+        binding.txtScoreHome.text = (viewModel.homeScore.value ?: 0).toString()
+        binding.txtScoreAway.text = (viewModel.awayScore.value ?: 0).toString()
+    }
+
     private fun setupViewModelObservers() {
         // Observe ViewModel changes and update UI accordingly
         viewModel.gameTime.observe(this) { timeText ->
             binding.txtGameTime.text = timeText
+        }
+
+        viewModel.shotClock.observe(this) { shotClockText ->
+            binding.txtShotTime.text = shotClockText
         }
 
         viewModel.quarter.observe(this) { quarterText ->
@@ -72,9 +92,28 @@ class InputStatsActivity : AppCompatActivity() {
         viewModel.awayScore.observe(this) { score ->
             binding.txtScoreAway.text = score.toString()
         }
+
+        // Add observations for timer state
+        viewModel.isGameTimerRunning.observe(this) { isRunning ->
+            // Update UI elements that should reflect timer state
+            // For example, you might want to change the color of the timer text
+            binding.txtGameTime.setTextColor(
+                if (isRunning) getColor(R.color.running_timer) else getColor(R.color.paused_timer)
+            )
+        }
     }
 
     private fun setupButtonClickListeners() {
+        // Add timer control
+        binding.txtGameTime.setOnClickListener {
+            toggleGameTimer()
+        }
+
+        binding.txtShotTime.setOnClickListener {
+            // Optional: Add shot clock control if needed
+            // Maybe reset to 24 on quick tap, 14 on long press
+        }
+
         // Scoring buttons - Made shots
         binding.btn1pt.setOnClickListener { openPlayerSelect("1PT") }
         binding.btn2pt.setOnClickListener { openPlayerSelect("2PT") }
@@ -95,6 +134,22 @@ class InputStatsActivity : AppCompatActivity() {
 
         // Navigation button
         binding.btnBackToMain.setOnClickListener { goToMain() }
+    }
+
+    // Game Timer Control - matches MainActivity logic
+    private fun toggleGameTimer() {
+        if (viewModel.isTimeoutRunning.value == true) {
+            Toast.makeText(this, "Cannot start timer during timeout", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (viewModel.isGameTimerRunning.value == true) {
+            viewModel.pauseGameTimer()
+            Toast.makeText(this, "Game timer paused", Toast.LENGTH_SHORT).show()
+        } else {
+            viewModel.startGameTimer()
+            Toast.makeText(this, "Game timer started", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupGestureDetection() {
@@ -121,19 +176,14 @@ class InputStatsActivity : AppCompatActivity() {
 
                     // Check for horizontal swipe with sufficient distance and velocity
                     if (abs(diffX) > 100 && abs(velocityX) > 200) {
-                        if (diffX > 0) {
-                            // Right swipe
-                            if (isDebugMode) {
-                                Toast.makeText(this@InputStatsActivity, "Two-finger swipe RIGHT", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            // Left swipe
+                        if (diffX < 0) {
+                            // Left swipe - go to main
                             if (isDebugMode) {
                                 Toast.makeText(this@InputStatsActivity, "Two-finger swipe LEFT", Toast.LENGTH_SHORT).show()
                             }
                             goToMain()
+                            return true
                         }
-                        return true
                     }
                 }
                 return false
@@ -152,7 +202,7 @@ class InputStatsActivity : AppCompatActivity() {
         }
 
         // Let the gesture detector process the event
-        val gestureResult = gestureDetector.onTouchEvent(ev)
+        gestureDetector.onTouchEvent(ev)
 
         // Reset when gesture sequence ends
         if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) {
