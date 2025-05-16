@@ -24,17 +24,20 @@ class MatchHistoryAdapter(
         val log = logs[position]
         val parts = log.split(" • ")
 
-        holder.binding.txtLogEntry.text = parts.take(2).joinToString(" • ")
+        // This shows only the main text, e.g. "12:05 - John . 3PT"
+        holder.binding.txtLogEntry.text = parts[0]
 
-        val team = parts.getOrNull(2)
+        // Color based on team info (if available)
+        val team = parts.getOrNull(1)
         val color = when (team) {
-            "HOME" -> Color.parseColor("#00FF00") // green
-            "AWAY" -> Color.parseColor("#FF5555") // red
+            "HOME" -> Color.parseColor("#00FF00")
+            "AWAY" -> Color.parseColor("#FF5555")
             else -> Color.WHITE
         }
 
         holder.binding.txtLogEntry.setTextColor(color)
     }
+
 
     override fun getItemCount(): Int = logs.size
 }

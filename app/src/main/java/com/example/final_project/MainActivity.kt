@@ -1,11 +1,15 @@
 package com.example.final_project
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -20,12 +24,15 @@ import com.example.final_project.databinding.ModalEditLayoutBinding // Import fo
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.IgnoreExtraProperties
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var modalBinding: ModalEditLayoutBinding // Binding for the modal layout
     private lateinit var database: DatabaseReference
+    private lateinit var gestureDetector: GestureDetector
+    private var maxPointerCountDuringGesture = 0
     private var currentUserId: String? = null
 
 //    Game Time Control
@@ -81,13 +88,13 @@ class MainActivity : AppCompatActivity() {
         DummyPlayer("Jake")
     )
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var isDataLoaded = false
         installSplashScreen().setKeepOnScreenCondition {
             !isDataLoaded
         }
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -95,10 +102,17 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Firebase Database
         database = FirebaseDatabase.getInstance().reference
+        val gameStateRef = database.child("game_state")
+
 
         // Set onClickListener for the main Edit button to show the modal
         binding.btnMenu.setOnClickListener {
-            showModal()
+            Toast.makeText(this, "Switch Screen Clicked", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, InputStatsActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish() // 🔥 This removes MainActivity from back stack
+
         }
 
         binding.timerTextView.setOnClickListener {
@@ -116,9 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         modalBinding.btnBreakModal.setOnClickListener {
-            Toast.makeText(this, "Break Button Clicked", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, InputStatsActivity::class.java)
-            startActivity(intent)
             // Add your Break functionality here
         }
         modalBinding.btnSwitchModal.setOnClickListener {
@@ -220,9 +231,73 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                // Check if we had at least 2 fingers during this gesture
+                if (maxPointerCountDuringGesture >= 2 && e1 != null) {
+                    val diffX = e2.x - e1.x
+
+                    // Debug logs
+                    Log.d("GestureDebug", "Fling detected with $maxPointerCountDuringGesture pointers")
+                    Log.d("GestureDebug", "Fling distance X: $diffX, velocity X: $velocityX")
+
+                    // Check for horizontal swipe with sufficient distance and velocity
+                    if (abs(diffX) > 100 && abs(velocityX) > 200) {
+                        if (diffX > 0) {
+                            // Right swipe
+                            Toast.makeText(this@MainActivity, "Two-finger swipe right", Toast.LENGTH_SHORT).show()
+                            goToStats()
+                        } else {
+                            // Left swipe
+                            Toast.makeText(this@MainActivity, "Swipe right to switch screen!", Toast.LENGTH_SHORT).show()
+                        }
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+
+
 
         isDataLoaded = true
     }
+
+
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        // Track the maximum number of pointers during this gesture
+        if (ev.pointerCount > maxPointerCountDuringGesture) {
+            maxPointerCountDuringGesture = ev.pointerCount
+        }
+
+        // Process the gesture
+        val result = gestureDetector.onTouchEvent(ev)
+
+        // Reset count when the gesture ends
+        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) {
+            val finalPointerCount = maxPointerCountDuringGesture
+            maxPointerCountDuringGesture = 0
+
+            // For debugging
+            Log.d("GestureDebug", "Gesture ended with max pointers: $finalPointerCount")
+        }
+
+        return result || super.dispatchTouchEvent(ev)
+    }
+
+    private fun goToStats() {
+        val intent = Intent(this, InputStatsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
+
 
     private fun showModal() {
         modalBinding.modalEditContainer.visibility = View.VISIBLE
@@ -291,7 +366,10 @@ class MainActivity : AppCompatActivity() {
     private fun updateGameTimeDisplay() {
         val minutes = (gameTimeRemaining / 1000) / 60
         val seconds = (gameTimeRemaining / 1000) % 60
-        binding.timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+        val timeString = String.format("%02d:%02d", minutes, seconds)
+        binding.timerTextView.text = timeString
+
+        pushGameStateToFirebase()
     }
 //    Game Time Control
 
@@ -300,6 +378,8 @@ class MainActivity : AppCompatActivity() {
     private fun updateScores() {
         binding.teamHomeScore.text = homeScore.toString()
         binding.teamAwayScore.text = awayScore.toString()
+
+        pushGameStateToFirebase()
     }
 //    Score Management
 
@@ -474,6 +554,26 @@ class MainActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
+
+//firebase
+    private fun pushGameStateToFirebase() {
+        val currentTime = binding.timerTextView.text.toString()
+        val quarter = binding.periodTextView.text.toString()
+        val home = homeScore
+        val away = awayScore
+
+        val state = mapOf(
+            "time" to currentTime,
+            "quarter" to quarter,
+            "score_home" to home,
+            "score_away" to away
+        )
+
+        database.child("game_state").setValue(state)
+    }
+//firebase
+
 
 
 }

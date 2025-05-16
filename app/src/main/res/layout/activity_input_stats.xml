@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -8,6 +9,7 @@
     android:background="#1A1A2E">
 
     <!-- LEFT PANEL -->
+
     <LinearLayout
         android:id="@+id/scoreButtonsPanel"
         android:layout_width="0dp"
@@ -16,6 +18,17 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_marginEnd="8dp">
+
+
+        <Button
+            android:id="@+id/btnBackToMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/white"
+            android:text="Back"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btn3pt"
@@ -45,10 +58,13 @@
             android:textColor="#FFFFFF"
             android:backgroundTint="#00FF00"
             android:layout_marginTop="12dp" />
+
     </LinearLayout>
 
     <!-- MIDDLE PANEL -->
+
     <LinearLayout
+
         android:id="@+id/historyPanel"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -57,6 +73,8 @@
         android:background="#0F0F1F"
         android:padding="8dp"
         android:layout_marginEnd="8dp">
+
+
 
         <!-- SCORE HEADER -->
         <LinearLayout
