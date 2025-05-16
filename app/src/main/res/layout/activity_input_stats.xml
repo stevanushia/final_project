@@ -64,6 +64,58 @@
     <!-- MIDDLE PANEL -->
 
     <LinearLayout
+        android:id="@+id/scoreMissedButtonsPanel"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <Button
+            android:id="@+id/invisbtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:backgroundTint="@color/white"
+            android:text="Back"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/btn3ptMiss"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:backgroundTint="#FF0000"
+            android:text="3pt"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn2ptMiss"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF0000"
+            android:text="2pt"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn1ptMiss"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF0000"
+            android:text="1pt"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
 
         android:id="@+id/historyPanel"
         android:layout_width="0dp"

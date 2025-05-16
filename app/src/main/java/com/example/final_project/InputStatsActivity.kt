@@ -6,20 +6,13 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.final_project.databinding.ActivityInputStatsBinding
-import com.example.final_project.databinding.InputStatsItemBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.math.abs
 
 class InputStatsActivity : AppCompatActivity() {
@@ -31,12 +24,12 @@ class InputStatsActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityInputStatsBinding
+    private val viewModel = GameViewModelProvider.gameStateViewModel
 
     private lateinit var gestureDetector: GestureDetector
     private var maxPointerCountDuringGesture = 0
+    private var isDebugMode = true // Set to false for production
 
-    private var homeScore = 0
-    private var awayScore = 0
     private var selectedTeam = "HOME" // optional if you're planning team logic
 
     private val matchLogList = mutableListOf<String>()
@@ -48,16 +41,49 @@ class InputStatsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         loadMatchLogs()
+        setupGestureDetection()
 
         // Match history setup
         matchLogAdapter = MatchHistoryAdapter(matchLogList)
         binding.recyclerHistory.adapter = matchLogAdapter
         binding.recyclerHistory.layoutManager = LinearLayoutManager(this)
 
-        // Scoring buttons
+        // Set up all button click listeners
+        setupButtonClickListeners()
+
+        // Set up ViewModel observers
+        setupViewModelObservers()
+    }
+
+    private fun setupViewModelObservers() {
+        // Observe ViewModel changes and update UI accordingly
+        viewModel.gameTime.observe(this) { timeText ->
+            binding.txtGameTime.text = timeText
+        }
+
+        viewModel.quarter.observe(this) { quarterText ->
+            binding.txtQuarter.text = quarterText
+        }
+
+        viewModel.homeScore.observe(this) { score ->
+            binding.txtScoreHome.text = score.toString()
+        }
+
+        viewModel.awayScore.observe(this) { score ->
+            binding.txtScoreAway.text = score.toString()
+        }
+    }
+
+    private fun setupButtonClickListeners() {
+        // Scoring buttons - Made shots
         binding.btn1pt.setOnClickListener { openPlayerSelect("1PT") }
         binding.btn2pt.setOnClickListener { openPlayerSelect("2PT") }
         binding.btn3pt.setOnClickListener { openPlayerSelect("3PT") }
+
+        // Scoring buttons - Missed shots
+        binding.btn1ptMiss.setOnClickListener { openPlayerSelect("1PT MISS") }
+        binding.btn2ptMiss.setOnClickListener { openPlayerSelect("2PT MISS") }
+        binding.btn3ptMiss.setOnClickListener { openPlayerSelect("3PT MISS") }
 
         // Stat buttons
         binding.btnAssist.setOnClickListener { openPlayerSelect("ASSIST") }
@@ -67,55 +93,44 @@ class InputStatsActivity : AppCompatActivity() {
         binding.btnTurnover.setOnClickListener { openPlayerSelect("TURNOVER") }
         binding.btnFoul.setOnClickListener { openPlayerSelect("FOUL") }
 
+        // Navigation button
+        binding.btnBackToMain.setOnClickListener { goToMain() }
+    }
 
-        val gameStateRef = FirebaseDatabase.getInstance().getReference("game_state")
-        gameStateRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val time = snapshot.child("time").getValue(String::class.java) ?: "00:00"
-                val quarter = snapshot.child("quarter").getValue(String::class.java) ?: "Q1"
-                val home = snapshot.child("score_home").getValue(Int::class.java) ?: 0
-                val away = snapshot.child("score_away").getValue(Int::class.java) ?: 0
-
-                binding.txtGameTime.text = time
-                binding.txtQuarter.text = quarter
-                binding.txtScoreHome.text = home.toString()
-                binding.txtScoreAway.text = away.toString()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("Firebase", "Failed to read game state: ${error.message}")
-            }
-        })
-
-        binding.btnBackToMain.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish() // Optional: clear activity from stack
-        }
-
+    private fun setupGestureDetection() {
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDown(e: MotionEvent): Boolean {
+                // Always return true for down events to ensure other gesture events are processed
+                return true
+            }
+
             override fun onFling(
                 e1: MotionEvent?,
                 e2: MotionEvent,
                 velocityX: Float,
                 velocityY: Float
             ): Boolean {
-                // Check if we had at least 2 fingers during this gesture
                 if (maxPointerCountDuringGesture >= 2 && e1 != null) {
                     val diffX = e2.x - e1.x
 
                     // Debug logs
-                    Log.d("GestureDebug", "Fling detected with $maxPointerCountDuringGesture pointers")
-                    Log.d("GestureDebug", "Fling distance X: $diffX, velocity X: $velocityX")
+                    if (isDebugMode) {
+                        Log.d("GestureDebug", "Fling detected with $maxPointerCountDuringGesture pointers")
+                        Log.d("GestureDebug", "Fling distance X: $diffX, velocity X: $velocityX")
+                    }
 
                     // Check for horizontal swipe with sufficient distance and velocity
                     if (abs(diffX) > 100 && abs(velocityX) > 200) {
                         if (diffX > 0) {
                             // Right swipe
-                            Toast.makeText(this@InputStatsActivity, "Swipe Left to go back!", Toast.LENGTH_SHORT).show()
+                            if (isDebugMode) {
+                                Toast.makeText(this@InputStatsActivity, "Two-finger swipe RIGHT", Toast.LENGTH_SHORT).show()
+                            }
                         } else {
                             // Left swipe
-                            Toast.makeText(this@InputStatsActivity, "Two-finger swipe left", Toast.LENGTH_SHORT).show()
+                            if (isDebugMode) {
+                                Toast.makeText(this@InputStatsActivity, "Two-finger swipe LEFT", Toast.LENGTH_SHORT).show()
+                            }
                             goToMain()
                         }
                         return true
@@ -124,7 +139,31 @@ class InputStatsActivity : AppCompatActivity() {
                 return false
             }
         })
+    }
 
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        // Track the maximum number of pointers during this gesture
+        if (ev.pointerCount > maxPointerCountDuringGesture) {
+            maxPointerCountDuringGesture = ev.pointerCount
+
+            if (isDebugMode) {
+                Log.d("GestureDebug", "Pointer count increased to: $maxPointerCountDuringGesture")
+            }
+        }
+
+        // Let the gesture detector process the event
+        val gestureResult = gestureDetector.onTouchEvent(ev)
+
+        // Reset when gesture sequence ends
+        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) {
+            if (isDebugMode) {
+                Log.d("GestureDebug", "Gesture ended with max pointers: $maxPointerCountDuringGesture")
+            }
+            maxPointerCountDuringGesture = 0
+        }
+
+        // Pass the event to the view hierarchy regardless of gesture detection
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun goToMain() {
@@ -132,28 +171,6 @@ class InputStatsActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
-    }
-
-
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        // Track the maximum number of pointers during this gesture
-        if (ev.pointerCount > maxPointerCountDuringGesture) {
-            maxPointerCountDuringGesture = ev.pointerCount
-        }
-
-        // Process the gesture
-        val result = gestureDetector.onTouchEvent(ev)
-
-        // Reset count when the gesture ends
-        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) {
-            val finalPointerCount = maxPointerCountDuringGesture
-            maxPointerCountDuringGesture = 0
-
-            // For debugging
-            Log.d("GestureDebug", "Gesture ended with max pointers: $finalPointerCount")
-        }
-
-        return result || super.dispatchTouchEvent(ev)
     }
 
     private fun openPlayerSelect(statType: String) {
@@ -171,29 +188,36 @@ class InputStatsActivity : AppCompatActivity() {
             val team = data.getStringExtra("team") ?: "HOME" // fallback
 
             selectedTeam = team // Update team
+
+            // Log the stat for both made and missed shots
             logStat(playerName, statType)
 
-            if (team == "HOME") {
-                when (statType) {
-                    "1PT" -> homeScore += 1
-                    "2PT" -> homeScore += 2
-                    "3PT" -> homeScore += 3
-                }
-            } else if (team == "AWAY") {
-                when (statType) {
-                    "1PT" -> awayScore += 1
-                    "2PT" -> awayScore += 2
-                    "3PT" -> awayScore += 3
+            // Only update score for made shots (not misses)
+            if (!statType.contains("MISS")) {
+                val currentHomeScore = viewModel.homeScore.value ?: 0
+                val currentAwayScore = viewModel.awayScore.value ?: 0
+
+                if (team == "HOME") {
+                    when (statType) {
+                        "1PT" -> viewModel.homeScore.postValue(currentHomeScore + 1)
+                        "2PT" -> viewModel.homeScore.postValue(currentHomeScore + 2)
+                        "3PT" -> viewModel.homeScore.postValue(currentHomeScore + 3)
+                    }
+                } else if (team == "AWAY") {
+                    when (statType) {
+                        "1PT" -> viewModel.awayScore.postValue(currentAwayScore + 1)
+                        "2PT" -> viewModel.awayScore.postValue(currentAwayScore + 2)
+                        "3PT" -> viewModel.awayScore.postValue(currentAwayScore + 3)
+                    }
                 }
             }
-
-            updateScoreDisplay()
         }
     }
 
     private fun logStat(player: String, stat: String) {
         val time = binding.txtGameTime.text.toString()
-        val entry = "$time - $player . $stat • $selectedTeam"
+        val quarter = binding.txtQuarter.text.toString()
+        val entry = "$quarter - $time - $player : $stat • $selectedTeam"
 
         // Save locally
         matchLogList.add(0, entry)
@@ -203,6 +227,14 @@ class InputStatsActivity : AppCompatActivity() {
         // Push to Firebase
         val logRef = FirebaseDatabase.getInstance().getReference("match_logs")
         logRef.push().setValue(entry)
+
+        // Show feedback
+        val feedback = if (stat.contains("MISS")) {
+            "$player missed a ${stat.replace(" MISS", "")} shot"
+        } else {
+            "$player recorded a $stat"
+        }
+        Toast.makeText(this, feedback, Toast.LENGTH_SHORT).show()
     }
 
     private fun loadMatchLogs() {
@@ -224,13 +256,5 @@ class InputStatsActivity : AppCompatActivity() {
                 Log.e("Firebase", "Failed to load logs: ${error.message}")
             }
         })
-    }
-
-
-
-
-    private fun updateScoreDisplay() {
-        binding.txtScoreHome.text = homeScore.toString()
-        binding.txtScoreAway.text = awayScore.toString()
     }
 }
